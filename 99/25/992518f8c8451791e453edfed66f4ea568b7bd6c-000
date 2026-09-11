@@ -117,6 +117,8 @@ body{
   transition:background var(--t) var(--ease), color var(--t) var(--ease);
 }
 img{display:block;max-width:100%}
+/* `hidden` must win over img{display:block}, or a hidden hero image shows as a broken icon. */
+[hidden]{display:none !important}
 a{color:inherit;text-decoration:none}
 .n{font-family:var(--zr-font-serif);font-weight:var(--zr-weight-numbers);font-variant-numeric:lining-nums tabular-nums}
 .wrap{max-width:var(--page-max);margin:0 auto;padding:0 var(--page-pad)}
@@ -301,6 +303,7 @@ a:hover > .plate, .card:hover .plate{transform:translateY(-4px);box-shadow:var(-
 <main id="top">
 
   <section class="hero" aria-label="Featured environment">
+    <img class="hero-img" id="heroImg" alt="" hidden>
     <div class="hero-veil"></div>
     <div class="hero-text">
       <div class="wrap">
@@ -314,6 +317,7 @@ a:hover > .plate, .card:hover .plate{transform:translateY(-4px);box-shadow:var(-
         </div>
       </div>
     </div>
+    <p class="hero-credit" id="heroCredit" hidden></p>
   </section>
 
   <div class="wrap">
@@ -409,19 +413,26 @@ const TYPES = {
    img: null draws an empty plate: a missing render is shown as missing, never faked.
    FR : trois projets fictifs, un par famille ; img null = vignette vide, jamais une fausse image. */
 const PRODUCTS = [
-  { id: "lorem", title: "Lorem Ipsum", sub: "Dolor sit amet environment", type: "env",
-    software: "Houdini to Unreal", store: "Fab", price: "Soon", img: null, alt: "" },
+  { id: "bayou", title: "Louisiana Bayou Church", sub: "Procedural wooden church, three Houdini HDA components", type: "env",
+    software: "Houdini to Unreal", store: "Fab", price: "Soon", img: "assets/02-louisiana-bayou-church.webp",
+    alt: "Clay render of a procedural wooden church with a bell cross, built in Houdini" },
   { id: "dolor", title: "Dolor Sit", sub: "Consectetur procedural tool", type: "tool",
     software: "Houdini", store: "Gumroad", price: "Soon", img: null, alt: "" },
   { id: "amet", title: "Amet Elit", sub: "Adipiscing layered material", type: "material",
     software: "Substance Designer", store: "Fab", price: "Soon", img: null, alt: "" }
 ];
 
-const FEATURED = ["lorem", "dolor", "amet"];
+const FEATURED = ["bayou", "dolor", "amet"];
+
+/* The hero render, data like the rest: null keeps the plain dark hero, a real render fills it.
+   FR : le rendu d'ouverture, une donnée comme le reste ; null garde le hero sombre. */
+const HERO = { img: "assets/01-louisiana-bayou-render.webp", credit: "Louisiana Bayou · Unreal Engine 5",
+  alt: "A wooden church on a sand flat with an alligator in the foreground, rendered in Unreal Engine 5" };
 
 const COLLECTIONS = [
-  { title: "Lorem ipsum dolor", ids: ["lorem"], img: null, alt: "",
-    text: "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." },
+  { title: "Procedural Houdini environments", ids: ["bayou"], img: "assets/03-louisiana-bayou-roof.webp",
+    alt: "Procedural shingle roof from the Louisiana Bayou church",
+    text: "Environments built as Houdini digital assets and delivered in Unreal, starting with the Louisiana Bayou church." },
   { title: "Consectetur adipiscing", ids: ["dolor"], img: null, alt: "",
     text: "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris." },
   { title: "Tempor incididunt", ids: ["amet"], img: null, alt: "",
@@ -470,6 +481,15 @@ function productCard(p){
         <span class="card-foot"><span class="price n">${p.price}</span><span class="store">on ${p.store}</span></span>
       </span>
     </a>`;
+}
+
+function renderHero(){
+  if (!HERO) return;
+  const img = document.getElementById("heroImg");
+  img.src = HERO.img; img.alt = HERO.alt; img.hidden = false;
+  if (HERO.focus) img.style.objectPosition = HERO.focus;
+  const credit = document.getElementById("heroCredit");
+  credit.textContent = HERO.credit || ""; credit.hidden = !HERO.credit;
 }
 
 function renderNav(){
@@ -579,7 +599,7 @@ document.getElementById("searchInput").addEventListener("input", (e) => {
   if (query) document.getElementById("latest").scrollIntoView({ block: "start" });
 });
 
-renderNav(); renderFeatured(); renderCollections(); renderFilters(); renderLatest();
+renderHero(); renderNav(); renderFeatured(); renderCollections(); renderFilters(); renderLatest();
 renderServices(); renderJournal(); renderTools();
 </script>
 </body>
